@@ -38,5 +38,17 @@ KelpInput3Summarized <- as.data.frame(KelpInput3Summarized[,c("SampleDate","Site
 #Create merged dataframe.
 KelpData <- rbind(KelpInput1,KelpInput2Summarized,KelpInput3Summarized)
 
+#Standardize date format.
+KelpData$SampleDate <- as.Date(KelpData$SampleDate,format="%d-%b-%y")
+
+#Remove duplicate lines.
+KelpData <- KelpData[!duplicated(KelpData),]
+
 #Export merged data frame to begin extracting map layer values at its coordinates.
 write.table(KelpData,"KelpData.txt",quote=FALSE,sep="\t",row.names = FALSE)
+
+#Split kelp data into separate files by species.
+for(species in unique(KelpData$BenthicReefSpecies)){
+  write.table(KelpData[KelpData$BenthicReefSpecies==species,],paste("KelpData",gsub(" ", "", species, fixed = TRUE),".txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+  print(paste(species,nrow(KelpData[KelpData$BenthicReefSpecies==species,])))
+}
